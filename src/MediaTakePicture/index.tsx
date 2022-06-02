@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import './App.css'
+import { Button } from 'antd'
+import { useState, useRef, useEffect } from 'react'
 
 const width = 320
 
-function App() {
+const MediaTakePicture = () => {
   const [imgUrl, setImgUrl] = useState('')
   const saveImg = (canvas: HTMLCanvasElement) => {
     const data = canvas.toDataURL('image/png')
@@ -75,9 +75,9 @@ function App() {
         onCanPlay={handleCanPlay}
         ref={videoRef}
       ></video>
-      <button onClick={startUp}>start up</button>
-      <button onClick={stop}>stop</button>
-      <button onClick={takePicture}>take picture</button>
+      <Button onClick={startUp}>start up</Button>
+      <Button onClick={stop}>stop</Button>
+      <Button onClick={takePicture}>take picture</Button>
       <canvas
         className="none"
         width={width}
@@ -91,4 +91,4 @@ function App() {
   )
 }
 
-export default App
+export default MediaTakePicture

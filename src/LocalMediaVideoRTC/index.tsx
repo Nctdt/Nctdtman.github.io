@@ -1,19 +1,17 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import './App.css'
-import { connectPeers } from './peers'
+import { useRef, useState } from 'react'
+import { connectPeers, disconnectPeers } from '@/peers'
+import { Button } from 'antd'
 
-const width = 320
-
-function App() {
+const LocalMediaVideoRTC = () => {
   const [disabled, setDisabled] = useState({
     start: false,
     remote: false,
+    hangUp: true,
     stop: true,
   })
   const localVideoRef = useRef<HTMLVideoElement>(null)
   const remoteVideoRef = useRef<HTMLVideoElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
-  const streamsRef = useRef<MediaStream[] | null>(null)
   const startUp = async () => {
     const video = localVideoRef.current
     if (!video) return
@@ -47,10 +45,10 @@ function App() {
   }
   const connectRemote = async () => {
     console.log('开始连接远程')
-    const localVideo = localVideoRef.current
     const remoteVideo = remoteVideoRef.current
-    if (localVideo && remoteVideo) {
-      await connectPeers((localVideo as any).captureStream() as MediaStream, {
+    const stream = streamRef.current
+    if (stream && remoteVideo) {
+      await connectPeers(stream, {
         remoteEvent: {
           track(ev) {
             console.log('streams: ', ev.streams)
@@ -62,26 +60,36 @@ function App() {
       setDisabled(d => ({
         ...d,
         remote: true,
+        hangUp: false,
       }))
     }
   }
+  const hangUp = () => {
+    disconnectPeers()
+    setDisabled(d => ({
+      ...d,
+      remote: false,
+      hangUp: true,
+    }))
+  }
   return (
     <div className="App">
-      <video ref={localVideoRef} height="400" controls muted>
-        <source src="/meida/test.mp4" />
-      </video>
-      <video ref={remoteVideoRef} height="400" autoPlay></video>
-      {/* <button onClick={startUp} disabled={disabled['start']}>
+      <video ref={localVideoRef}></video>
+      <video ref={remoteVideoRef} autoPlay></video>
+      <Button onClick={startUp} disabled={disabled['start']}>
         start up
-      </button> */}
-      <button onClick={connectRemote} disabled={disabled['remote']}>
+      </Button>
+      <Button onClick={connectRemote} disabled={disabled['remote']}>
         remote
-      </button>
-      <button onClick={stop} disabled={disabled['stop']}>
+      </Button>
+      <Button onClick={hangUp} disabled={disabled['hangUp']}>
+        hang up
+      </Button>
+      <Button onClick={stop} disabled={disabled['stop']}>
         stop
-      </button>
+      </Button>
     </div>
   )
 }
 
-export default App
+export default LocalMediaVideoRTC
