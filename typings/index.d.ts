@@ -11,7 +11,7 @@ type UserInfo = {
 }
 
 type WsDataMap = {
-  userInfo: Data<'id', UserInfo>
+  userInfo: Data<'userInfo', UserInfo>
   userList: Data<
     'userList',
     {
@@ -28,6 +28,41 @@ type WsDataMap = {
     'changeType',
     {
       type: UserType
+    }
+  >
+  closePeer: Data<'closePeer', { targetId: string }>
+  invite: Data<
+    'invite',
+    {
+      targetId: string
+      fromName: string
+    }
+  >
+  accessInvite: Data<
+    'accessInvite',
+    {
+      targetId: string
+    }
+  >
+  videoOffer: Data<
+    'videoOffer',
+    {
+      targetId: string
+      sdp: RTCSessionDescription
+    }
+  >
+  videoAnswer: Data<
+    'videoAnswer',
+    {
+      targetId: string
+      sdp: RTCSessionDescription
+    }
+  >
+  newIceCandidate: Data<
+    'newIceCandidate',
+    {
+      targetId: string
+      candidate: RTCIceCandidate
     }
   >
 }

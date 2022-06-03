@@ -72,8 +72,21 @@ wsServer.on('request', req => {
           allSendUserList()
           break
         }
+        case 'closePeer':
+        case 'invite':
+        case 'accessInvite':
+        case 'videoOffer':
+        case 'videoAnswer':
+        case 'newIceCandidate': {
+          const { targetId } = data
+          const targetConnection = findConnectionById(targetId)
+          if (targetConnection) {
+            const { connect } = targetConnection
+            send(connect, type, id, data)
+          }
+          break
+        }
       }
-      console.log(connections.map(({ user }) => user))
     }
   })
   connect.on('close', () => {

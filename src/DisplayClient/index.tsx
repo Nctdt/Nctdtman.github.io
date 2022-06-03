@@ -1,24 +1,20 @@
 import { Button, Input } from 'antd'
 import { observer } from 'mobx-react-lite'
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 
 import { useWs } from '@/context/Ws'
-import { runInAction } from 'mobx'
+import { autorun, runInAction } from 'mobx'
 
 export const DisplayClient: FC = observer(() => {
+  const videoRef = useRef<HTMLVideoElement>(null)
   const ws = useWs()
-  const [username, setUsername] = useState('')
-  const handleClick = () => {
-    ws.send('rename', { username })
-    runInAction(() => {
-      ws.user.username = username
-    })
+  const video = videoRef.current
+  if (ws.remoteStream && video && !video.srcObject) {
+    video.srcObject = ws.remoteStream
   }
   return (
     <div>
-      <div>当前用户名: {ws.user.username}</div>
-      <Input onChange={e => setUsername(e.target.value)} value={username} />
-      <Button onClick={handleClick}>rename Username</Button>
+      <video ref={videoRef} autoPlay></video>
     </div>
   )
 })

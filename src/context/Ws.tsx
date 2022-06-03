@@ -1,13 +1,12 @@
 import { createContext, FC, PropsWithChildren, useContext } from 'react'
-import { WsManager } from '@/utils/ws'
+import { ws } from '@/rtc/ws'
 
-const wsManager = new WsManager()
-const context = createContext<WsManager | null>(null)
+const context = createContext<typeof ws | null>(null)
 
 const useWs = () => useContext(context)!
 
 const WsProvider: FC<PropsWithChildren<{}>> = ({ children }) => {
-  return <context.Provider value={wsManager}>{children}</context.Provider>
+  return <context.Provider value={ws}>{children}</context.Provider>
 }
 
 export { WsProvider, useWs }

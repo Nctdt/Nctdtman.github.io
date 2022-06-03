@@ -42,7 +42,7 @@ const LocalVideoRTC = () => {
   return (
     <div className="App">
       <video ref={localVideoRef} height="400" controls muted>
-        <source src="/meida/test.mp4" />
+        <source src="/media/test.mp4" />
       </video>
       <video ref={remoteVideoRef} height="400" autoPlay></video>
       <Button onClick={connectRemote} disabled={disabled['remote']}>

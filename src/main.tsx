@@ -9,7 +9,7 @@ import './main.css'
 import App from './App'
 import { WsProvider } from './context/Ws'
 
-new VConsole()
+// new VConsole()
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
