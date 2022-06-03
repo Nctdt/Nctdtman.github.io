@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { connectPeers, disconnectPeers } from '@/peers'
+import { connectPeers, disconnectPeers } from '@/utils/peers'
 import { Button } from 'antd'
 
 const LocalVideoRTC = () => {
