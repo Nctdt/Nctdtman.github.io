@@ -6,15 +6,24 @@ import { FC, useEffect, useRef } from 'react'
 
 export const Agent: FC = observer(() => {
   const videoRef = useRef<HTMLVideoElement>(null)
-
   const ws = useWs()
+  if (ws.remoteStream && videoRef.current) {
+    console.log('ws.remoteStream: ', ws.remoteStream)
+    videoRef.current.srcObject = ws.remoteStream
+    videoRef.current.play()
+  }
   useEffect(() => {
     ws.send('changeType', { type: 'agent' })
   }, [])
 
-  const handleClick = (targetId: string) => {
+  const handleClick = async (targetId: string) => {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true,
+    })
+    console.log('local stream: ', stream)
     runInAction(() => {
-      ws.stream = (videoRef.current as any).captureStream() as MediaStream
+      ws.stream = stream
       ws.targetId = targetId
     })
     ws.send('invite', { targetId, fromName: '经纪人 name ' })
@@ -26,13 +35,11 @@ export const Agent: FC = observer(() => {
         renderItem={user => (
           <List.Item>
             用户: {user.username}, id: {user.id}
-            <Button onClick={() => handleClick(user.id)}>传输视频</Button>
+            <Button onClick={() => handleClick(user.id)}>发起语音通话</Button>
           </List.Item>
         )}
       />
-      <video ref={videoRef} controls muted>
-        <source src="/media/test.mp4" />
-      </video>
+      <video ref={videoRef} controls muted></video>
     </div>
   )
 })

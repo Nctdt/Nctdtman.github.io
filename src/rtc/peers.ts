@@ -56,7 +56,9 @@ function createPeer(
         break
     }
   }
+  console.log('peers stream: ', stream)
   stream?.getTracks().forEach(t => pc.addTransceiver(t, { streams: [stream] }))
+
   return (memoPc = pc)
 }
 

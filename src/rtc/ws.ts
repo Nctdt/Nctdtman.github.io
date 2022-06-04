@@ -56,12 +56,20 @@ class WsManager {
             content: fromName + '邀请你进行语音通话',
             onOk: async () => {
               console.log('同意请求了')
+              this.stream = await navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: true,
+              })
               createPeer(this.targetId, this.stream, {
                 track: ev => {
+                  const stream = ev.streams[0]
+                  const audioContext = new AudioContext()
+                  audioContext
+                    .createMediaStreamSource(stream)
+                    .connect(audioContext.destination)
                   runInAction(() => {
-                    this.remoteStream = ev.streams[0]
+                    this.remoteStream = stream
                   })
-                  console.log('remote stream:', this.remoteStream)
                 },
               })
               ws.send('accessInvite', { targetId: this.targetId })
@@ -72,6 +80,11 @@ class WsManager {
         case 'accessInvite': {
           createPeer(this.targetId, this.stream, {
             track: ev => {
+              const stream = ev.streams[0]
+              const audioContext = new AudioContext()
+              audioContext
+                .createMediaStreamSource(stream)
+                .connect(audioContext.destination)
               runInAction(() => {
                 this.remoteStream = ev.streams[0]
               })
