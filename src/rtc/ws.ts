@@ -3,6 +3,7 @@ import { autorun, makeAutoObservable, runInAction } from 'mobx'
 import { createPeer, disconnectPeer } from './peers'
 
 const wsUrl = `ws://${document.location.hostname}:6502`
+
 class WsManager {
   targetId = ''
   user = {} as UserInfo
@@ -23,6 +24,23 @@ class WsManager {
   }
   stream: MediaStream | undefined
   remoteStream: MediaStream | null = null
+  async getStreamAndCreatePeer() {
+    this.stream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+    })
+    createPeer(this.targetId, this.stream, {
+      track: ev => {
+        const stream = ev.streams[0]
+        const audioContext = new AudioContext()
+        audioContext
+          .createMediaStreamSource(stream)
+          .connect(audioContext.destination)
+        runInAction(() => {
+          this.remoteStream = ev.streams[0]
+        })
+      },
+    })
+  }
   constructor() {
     makeAutoObservable(this)
     this.connection.onopen = () => {
@@ -56,41 +74,14 @@ class WsManager {
             content: fromName + '邀请你进行语音通话',
             onOk: async () => {
               console.log('同意请求了')
-              this.stream = await navigator.mediaDevices.getUserMedia({
-                video: true,
-                audio: true,
-              })
-              createPeer(this.targetId, this.stream, {
-                track: ev => {
-                  const stream = ev.streams[0]
-                  const audioContext = new AudioContext()
-                  audioContext
-                    .createMediaStreamSource(stream)
-                    .connect(audioContext.destination)
-                  runInAction(() => {
-                    this.remoteStream = stream
-                  })
-                },
-              })
+              await this.getStreamAndCreatePeer()
               ws.send('accessInvite', { targetId: this.targetId })
             },
           })
           break
         }
         case 'accessInvite': {
-          createPeer(this.targetId, this.stream, {
-            track: ev => {
-              const stream = ev.streams[0]
-              const audioContext = new AudioContext()
-              audioContext
-                .createMediaStreamSource(stream)
-                .connect(audioContext.destination)
-              runInAction(() => {
-                this.remoteStream = ev.streams[0]
-              })
-              console.log('remote stream:', this.remoteStream)
-            },
-          })
+          await this.getStreamAndCreatePeer()
           break
         }
         case 'videoOffer': {

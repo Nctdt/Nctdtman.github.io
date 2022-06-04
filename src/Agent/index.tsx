@@ -17,13 +17,7 @@ export const Agent: FC = observer(() => {
   }, [])
 
   const handleClick = async (targetId: string) => {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    })
-    console.log('local stream: ', stream)
     runInAction(() => {
-      ws.stream = stream
       ws.targetId = targetId
     })
     ws.send('invite', { targetId, fromName: '经纪人 name ' })
